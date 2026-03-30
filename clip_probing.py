@@ -72,10 +72,10 @@ def run_clip_analysis(scene_idx, output_filename):
 
 if __name__ == "__main__":
     # Run Day Analysis (Scene 0)
-    df_day = run_clip_analysis(0, "clip_day_results.csv")
+    df_day = run_clip_analysis(0, "results/clip_day_results.csv")
 
     # Run Night Analysis (Scene 8)
-    df_night = run_clip_analysis(8, "clip_night_results.csv")
+    df_night = run_clip_analysis(8, "results/clip_night_results.csv")
 
     # Final Comparison Printout
     print("\n--- LOGIC COMPARISON ---")

@@ -211,9 +211,7 @@ dataset/
 *.csv
 
 # Ignore CLIP results and tables
-*.csv
-clip_day_results.csv
-clip_night_results.csv
+results/
 
 # Ignore any generated plots or images
 *.png
