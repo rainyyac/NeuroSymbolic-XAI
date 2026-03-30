@@ -205,3 +205,18 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# My Dataset
+dataset/
+*.csv
+
+# Ignore CLIP results and tables
+*.csv
+clip_day_results.csv
+clip_night_results.csv
+
+# Ignore any generated plots or images
+*.png
+*.jpg
+*.jpeg
+!dataset/
