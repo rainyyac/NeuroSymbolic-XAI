@@ -1,0 +1,46 @@
+"""
+CLIP MODEL MODULE
+
+This module is responsible for the "neural perception" part of the system.
+
+CLIP (Contrastive Language–Image Pretraining) is used to extract semantic
+information from an image by comparing it to text descriptions.
+
+IMPORTANT:
+- CLIP does NOT classify directly into "risk"
+- It only measures similarity between an image and text prompts
+"""
+
+import torch
+import clip
+from PIL import Image
+
+# Select device (GPU if available, otherwise CPU)
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# Load CLIP model (ViT-B/32 is a common lightweight version)
+model, preprocess = clip.load("ViT-B/32", device=device)
+
+
+def encode_image(image_path):
+    """
+    Encodes an image into a feature vector using CLIP.
+
+    This is the FIRST step in the pipeline:
+    Image → numerical representation (embedding)
+
+    Args:
+        image_path (str): path to image file
+
+    Returns:
+        image_features (Tensor): high-dimensional representation of the image
+    """
+
+    # Load image and apply CLIP preprocessing (resize, normalize, etc.)
+    image = preprocess(Image.open(image_path)).unsqueeze(0).to(device)
+
+    # Disable gradients (we are not training, only using inference)
+    with torch.no_grad():
+        image_features = model.encode_image(image)
+
+    return image_features
