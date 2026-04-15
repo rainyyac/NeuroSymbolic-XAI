@@ -6,9 +6,9 @@ This file connects ALL components:
 Image → CLIP → Attributes → ASP → Risk → Explanation
 """
 
-from perception.extractor import extract_attributes
-from grounding.grounder import to_asp_facts
-from reasoning.asp_runner import run_asp
+from src.perception.extractor import extract_attributes
+from src.grounding.grounder import to_asp_facts
+from src.reasoning.asp_runner import run_asp
 
 
 def main():

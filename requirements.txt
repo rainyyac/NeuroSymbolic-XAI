@@ -1,3 +1,4 @@
+clingo
 nuscenes-devkit
 torch
 torchvision

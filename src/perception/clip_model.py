@@ -15,11 +15,29 @@ import torch
 import clip
 from PIL import Image
 
-# Select device (GPU if available, otherwise CPU)
-device = "cuda" if torch.cuda.is_available() else "cpu"
+_clip_model = None
+_preprocess = None
+_device = None
 
-# Load CLIP model (ViT-B/32 is a common lightweight version)
-model, preprocess = clip.load("ViT-B/32", device=device)
+
+def get_model():
+    """
+    Lazily loads the CLIP model.
+
+    This ensures:
+    - model is loaded only once
+    - no loading at import time
+    - reusable across the whole program
+    """
+
+    global _clip_model, _preprocess, _device
+
+    if _clip_model is None:
+        print("Loading CLIP model...")
+        _device = "cuda" if torch.cuda.is_available() else "cpu"
+        _clip_model, _preprocess = clip.load("ViT-B/32", device=_device)
+
+    return _clip_model, _preprocess, _device
 
 
 def encode_image(image_path):
@@ -37,6 +55,7 @@ def encode_image(image_path):
     """
 
     # Load image and apply CLIP preprocessing (resize, normalize, etc.)
+    model, preprocess, device = get_model()
     image = preprocess(Image.open(image_path)).unsqueeze(0).to(device)
 
     # Disable gradients (we are not training, only using inference)

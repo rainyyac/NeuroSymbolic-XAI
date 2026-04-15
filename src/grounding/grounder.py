@@ -9,8 +9,7 @@ Example:
 This is where the system becomes fully symbolic.
 """
 
-
-def to_asp_facts(attributes):
+def to_asp_facts(attributes, threshold=0.45):
     """
     Converts attribute dictionary into ASP facts.
 
@@ -28,8 +27,12 @@ def to_asp_facts(attributes):
     facts = []
 
     for key, (value, conf) in attributes.items():
-        # Create a logical fact
-        fact = f"{key}({value})."
+        if conf < threshold:
+            fact = f"{key}(unknown)."
+            facts.append(fact)
+            continue
+
+        fact = f"{key}({value}, confidence({conf:.2f}))."
         facts.append(fact)
 
     return facts
