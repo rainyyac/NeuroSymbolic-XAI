@@ -10,9 +10,10 @@ It:
 """
 
 from clingo import Control
+import pathlib
+DEFAULT_RULES = pathlib.Path(__file__).parent.parent.parent / "asp" / "risk_rules_with_risk_factor.lp"
 
-
-def run_asp(facts, rules_path="asp/risk_rules.lp"):
+def run_asp(facts, rules_path=DEFAULT_RULES):
     """
     Runs ASP reasoning.
 
@@ -37,14 +38,18 @@ def run_asp(facts, rules_path="asp/risk_rules.lp"):
     # Ground the program (prepare for solving)
     ctl.ground([("base", [])])
 
-    result = None
+    answer_set = []
+    model_found = False
 
     # Solve the logic program
     with ctl.solve(yield_=True) as handle:
         for model in handle:
-            # Extract atoms from solution
-            for atom in model.symbols(shown=True):
-                if atom.name == "risk":
-                    result = atom.arguments[0].name
+            model_found = True
+            # Return strings for all atoms marked with #show
+            answer_set = [str(atom) for atom in model.symbols(shown=True)]
 
-    return result
+    if not model_found:
+        raise RuntimeError("ASP Error: The logic program is UNSATISFIABLE. "
+                           "Check for conflicting rules or violated integrity constraints.")
+
+    return answer_set

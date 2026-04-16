@@ -54,11 +54,9 @@ def encode_image(image_path):
         image_features (Tensor): high-dimensional representation of the image
     """
 
-    # Load image and apply CLIP preprocessing (resize, normalize, etc.)
+    # Load image, apply CLIP preprocessing (resize, normalize, etc.) and disable gradients
     model, preprocess, device = get_model()
     image = preprocess(Image.open(image_path)).unsqueeze(0).to(device)
-
-    # Disable gradients (we are not training, only using inference)
     with torch.no_grad():
         image_features = model.encode_image(image)
 

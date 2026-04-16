@@ -1,12 +1,8 @@
 """
 ATTRIBUTE EXTRACTION MODULE
 
-This is the MOST IMPORTANT bridge in the system.
+It converts CLIP numerical outputs into symbolic labels (grounding).
 
-It converts:
-    CLIP numerical outputs → symbolic labels
-
-This step is called "grounding" in neuro-symbolic AI.
 """
 
 import clip
@@ -54,7 +50,6 @@ def score_dimension(image_features, prompts):
 def get_label(scores, labels):
     """
     Converts probabilities into a discrete label.
-
     This is where continuous → symbolic happens.
 
     Args:
@@ -82,36 +77,13 @@ def extract_attributes(image_path):
     """
 
     image_features = encode_image(image_path)
+    results = {}
 
-    # --- PEDESTRIANS ---
-    ped_scores = score_dimension(image_features, PEDESTRIAN_PROMPTS)
-    ped_label, ped_conf = get_label(ped_scores, PEDESTRIAN_LABELS)
+    for dimension, mapping in PROMPT_MAP.items():
+        labels = list(mapping.keys())
+        prompts = list(mapping.values())
 
-    # --- TRAFFIC ---
-    traffic_scores = score_dimension(image_features, TRAFFIC_PROMPTS)
-    traffic_label, traffic_conf = get_label(traffic_scores, TRAFFIC_LABELS)
+        scores = score_dimension(image_features, prompts)
+        results[dimension] = get_label(scores, labels)
 
-    # --- CROSSWALK ---
-    crosswalk_scores = score_dimension(image_features, CROSSWALK_PROMPTS)
-    crosswalk_label, crosswalk_conf = get_label(crosswalk_scores, CROSSWALK_LABELS)
-
-    # --- OBSTRUCTION ---
-    obs_scores = score_dimension(image_features, OBSTRUCTION_PROMPTS)
-    obs_label, obs_conf = get_label(obs_scores, OBSTRUCTION_LABELS)
-
-    # --- EMERGENCY VEHICLE ---
-    em_scores = score_dimension(image_features, EMERGENCY_PROMPTS)
-    em_label, em_conf = get_label(em_scores, EMERGENCY_LABELS)
-
-    # --- VULNERABLE USERS ---
-    vu_scores = score_dimension(image_features, VULNERABLE_PROMPTS)
-    vu_label, vu_conf = get_label(vu_scores, VULNERABLE_LABELS)
-
-    return {
-        "pedestrian_density": (ped_label, ped_conf),
-        "traffic_density": (traffic_label, traffic_conf),
-        "crosswalk": (crosswalk_label, crosswalk_conf),
-        "obstruction": (obs_label, obs_conf),
-        "emergency_vehicle": (em_label, em_conf),
-        "vulnerable_user": (vu_label, vu_conf)
-    }
+    return results
