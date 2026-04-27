@@ -27,14 +27,16 @@ def to_asp_facts(attributes, threshold=0.45):
     facts = []
 
     for key, (value, conf) in attributes.items():
-        if conf < threshold: # If confidence is too low -> unknown
-            symbolic_value = "unknown"
-        else:
-            symbolic_value = value
+        # Handle uncertainty: if confidence is too low, ground as 'unknown'
+        if conf < threshold:
+            fact = f"{key}(unknown)."
+            facts.append(fact)
+            continue
 
-        fact = f"{key}({symbolic_value}."
+        conf_int = int(conf * 100)
+
+        # Fact format: attribute(label, confidence(score)).
+        fact = f"{key}({value}, confidence({conf_int}))."
         facts.append(fact)
-        debug = f"{key}_confidence({value}, {conf:.2f})."
-        facts.append(debug)
 
     return facts

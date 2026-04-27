@@ -28,8 +28,27 @@ def run_asp(facts, rules_path=DEFAULT_RULES):
     ctl = Control()
 
     # Load ASP rules from file
-    with open(rules_path, "r") as f:
-        ctl.add("base", [], f.read())
+    #with open(rules_path, "r") as f:
+    #    ctl.add("base", [], f.read())
+
+    # Load ASP rules from file
+    try:
+        # 1. Force UTF-8 encoding to prevent invisible character crashes
+        with open(rules_path, "r", encoding="utf-8") as f:
+            rules_text = f.read()
+
+        # 2. Add to clingo
+        ctl.add("base", [], rules_text)
+
+    except UnicodeDecodeError as e:
+        print("\n[FILE ERROR]: Your .lp file contains invalid characters (likely copy-paste artifacts).")
+        raise e
+    except RuntimeError as e:
+        print("\n[CLINGO ERROR]: There is a syntax error in your .lp file!")
+        raise e
+    except Exception as e:
+        print(f"\n[UNKNOWN ERROR on add/read]: {e}")
+        raise e
 
     # Add facts dynamically
     for fact in facts:

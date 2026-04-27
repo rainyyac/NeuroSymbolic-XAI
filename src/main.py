@@ -20,8 +20,7 @@ def main():
     parser.add_argument(
         "--image",
         type=str,
-        # Change required=True to default=...
-        default="dataset/v1.0-mini/samples/CAM_FRONT/n008-2018-08-01-15-16-36-0400__CAM_FRONT__1533151603512404.jpg",
+        default="dataset/v1.0-mini/samples/CAM_FRONT/n015-2018-07-24-11-22-45+0800__CAM_FRONT__1532402935662460.jpg",
         help="Path to the urban scene image"
     )
 
