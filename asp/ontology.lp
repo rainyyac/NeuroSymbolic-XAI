@@ -1,7 +1,6 @@
 % =========================================================
 % TAXONOMY (Class Hierarchy)
 % =========================================================
-% General syntax: subclass(Specific, General).
 
 % Actors
 subclass(pedestrian, vulnerable_actor).
@@ -17,16 +16,16 @@ subclass(car, vehicle).
 subclass(bus, vehicle).
 subclass(vehicle, actor).
 
+
 % =========================================================
-% INFERENCE LOGIC (The "Bridge")
+% INFERENCE LOGIC
 % =========================================================
 
-% 1. Transitivity: If A is a B, and B is a C, then A is a C.
+% Transitivity
 is_a(Entity, Parent) :- subclass(Entity, Parent).
 is_a(Entity, Grandparent) :- subclass(Entity, Parent), is_a(Parent, Grandparent).
 
-% 2. Perception Mapping: Connect CLIP facts to Ontological classes.
-% We "lift" the specific neural detection into the general ontology.
+% Connecting CLIP facts to Ontological classes.
 entity_present(pedestrian) :- pedestrian_density(high, _).
 entity_present(pedestrian) :- pedestrian_density(medium, _).
 entity_present(emergency_vehicle) :- emergency_vehicle(yes, _).
