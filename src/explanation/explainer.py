@@ -7,6 +7,8 @@ This is the XAI component of the system.
 """
 
 from src.perception.prompts import PROMPT_MAP
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 def explain(attributes, answer_set):
     """
@@ -53,3 +55,45 @@ def explain(attributes, answer_set):
         print("The scene is orderly. No high-severity risk factors were entailed by the logic.")
     else:
         print(f"The scene was elevated to {risk_label.upper()} due to: {', '.join(factors).replace('_', ' ')}.")
+
+
+def visualize_result(image_path, risk_label, attributes, save_path=None):
+    """
+    Creates a side-by-side dashboard.
+    If save_path is provided, it saves to disk. Otherwise, it pops up a window.
+    """
+    # Use a non-interactive backend if saving many images to avoid window pop-ups
+    if save_path:
+        import matplotlib
+        matplotlib.use('Agg')
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 8))
+
+    # 1. Plot the Image
+    img = mpimg.imread(image_path)
+    ax1.imshow(img)
+
+    # Logic for title color
+    color = 'green' if risk_label == 'safe' else 'orange' if risk_label == 'moderate' else 'red'
+    ax1.set_title(f"SCENE CLASSIFICATION: {risk_label.upper()}", fontsize=16, fontweight='bold', color=color)
+    ax1.axis('off')
+
+    # 2. Plot the Attribute Info (The Grounding)
+    text_info = "NEURAL PERCEPTION (CLIP):\n" + "-" * 30 + "\n"
+    for key, (val, conf) in attributes.items():
+        text_info += f"• {key.replace('_', ' ').title()}:\n  {val} (Conf: {conf:.2f})\n\n"
+
+    ax2.text(0.05, 0.5, text_info, fontsize=11, family='monospace',
+             verticalalignment='center', bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+    ax2.axis('off')
+    ax2.set_title("Grounding Data", fontsize=14, fontstyle='italic')
+
+    plt.tight_layout()
+
+    if save_path:
+        # If we have a path, SAVE the file and CLOSE it (no pop-up)
+        plt.savefig(save_path)
+        plt.close()
+    else:
+        # If no path, SHOW it (the pop-up window for main.py)
+        plt.show()

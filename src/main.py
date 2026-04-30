@@ -5,25 +5,26 @@ This file connects ALL components:
 
 Image → CLIP → Attributes → ASP → Risk → Explanation
 """
-import argparse
 
+import argparse
+import pathlib
 from src.perception.extractor import extract_attributes
 from src.grounding.grounder import to_asp_facts
 from src.reasoning.asp_runner import run_asp
-from src.explanation.explainer import explain
+from src.explanation.explainer import explain, visualize_result
 
 
 def main():
+    BASE_DIR = pathlib.Path(__file__).parent.parent
+    DEFAULT_IMAGE = BASE_DIR / "dataset" / "v1.0-mini" / "samples" / "CAM_FRONT" / "n008-2018-08-01-15-16-36-0400__CAM_FRONT__1533151603512404.jpg"
 
     parser = argparse.ArgumentParser(description="Neuro-Symbolic Urban Risk Classifier")
-
     parser.add_argument(
         "--image",
         type=str,
-        default="dataset/v1.0-mini/samples/CAM_FRONT/n015-2018-07-24-11-22-45+0800__CAM_FRONT__1532402935662460.jpg",
+        default=str(DEFAULT_IMAGE),
         help="Path to the urban scene image"
     )
-
     args = parser.parse_args()
 
     try:
@@ -35,14 +36,14 @@ def main():
 
         # STEP 3: REASONING
         answer_set = run_asp(facts)
+        risk_atom = next((a for a in answer_set if a.startswith("final_risk(")), "final_risk(unknown)")
+        risk_label = risk_atom.split("(")[1].rstrip(")")
 
         # STEP 4: EXPLANATION (Prints the reasoning trace)
         print("\n=== RESULTS ===")
         print(f"Image Tested: {args.image}")
-        if isinstance(answer_set, list):
-            explain(attributes, answer_set)
-        else:
-            explain(attributes, answer_set)
+        explain(attributes, answer_set)
+        visualize_result(args.image, risk_label, attributes)
 
     except RuntimeError as e:
         print(f"\n[CRITICAL ERROR] reasoning failed: {e}")

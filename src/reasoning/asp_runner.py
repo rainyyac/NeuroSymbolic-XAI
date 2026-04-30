@@ -11,9 +11,11 @@ It:
 
 from clingo import Control
 import pathlib
-DEFAULT_RULES = pathlib.Path(__file__).parent.parent.parent / "asp" / "risk_rules_with_risk_factor.lp"
+BASE_DIR = pathlib.Path(__file__).parent.parent.parent
+ONTOLOGY_PATH = BASE_DIR / "asp" / "ontology.lp"
+RULES_PATH = BASE_DIR / "asp" / "risk_rules_with_risk_factor.lp"
 
-def run_asp(facts, rules_path=DEFAULT_RULES):
+def run_asp(facts):
     """
     Runs ASP reasoning.
 
@@ -34,11 +36,15 @@ def run_asp(facts, rules_path=DEFAULT_RULES):
     # Load ASP rules from file
     try:
         # 1. Force UTF-8 encoding to prevent invisible character crashes
-        with open(rules_path, "r", encoding="utf-8") as f:
-            rules_text = f.read()
+        for file_path in [ONTOLOGY_PATH, RULES_PATH]:
+            with open(file_path, "r") as f:
+                ctl.add("base", [], f.read())
+
+        for fact in facts:
+            ctl.add("base", [], fact)
 
         # 2. Add to clingo
-        ctl.add("base", [], rules_text)
+        ctl.ground([("base", [])])
 
     except UnicodeDecodeError as e:
         print("\n[FILE ERROR]: Your .lp file contains invalid characters (likely copy-paste artifacts).")

@@ -29,12 +29,8 @@ risk_factor(traffic_conflict) :-
 % VULNERABLE EXPOSURE
 risk_factor(vulnerable_exposure) :-
     vulnerable_user(yes, confidence(C1)),
-    traffic_density(high, confidence(C2)),
-    C1 > 60, C2 > 60.
-
-risk_factor(vulnerable_exposure) :-
-    vulnerable_user(yes, confidence(C1)),
-    traffic_density(medium, confidence(C2)),
+    traffic_density(T, confidence(C2)),
+    T != low,
     C1 > 60, C2 > 60.
 
 % EMERGENCY SITUATION
@@ -90,10 +86,19 @@ risk_factor(moderate_vulnerable_risk) :-
     traffic_density(low, confidence(C2)),
     C1 > 60, C2 > 60.
 
+% NO CROSSWALK IN MODERATE TRAFFIC
+risk_factor(infrastructure_failure) :-
+    pedestrian_density(medium, confidence(C1)),
+    crosswalk(absent, confidence(C2)),
+    traffic_density(medium, confidence(C3)),
+    C1 > 60, C2 > 60, C3 > 60.
+
 % UNKNOWN UNCERTAINTY
 risk_factor(uncertain) :-
-    pedestrian_density(unknown),
-    traffic_density(high, confidence(_)).
+    pedestrian_density(unknown).
+
+risk_factor(uncertain) :-
+    traffic_density(unknown).
 
 
 % =========================================================
