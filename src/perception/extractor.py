@@ -65,7 +65,7 @@ def get_label(scores, labels):
     return labels[idx], scores[idx]
 
 
-def extract_attributes(image_path):
+def extract_attributes(image_path, prompt_map):
     """
     Full perception pipeline.
 
@@ -79,9 +79,20 @@ def extract_attributes(image_path):
     image_features = encode_image(image_path)
     results = {}
 
-    for dimension, mapping in PROMPT_MAP.items():
-        labels = list(mapping.keys())
-        prompts = list(mapping.values())
+    for dimension, mapping in prompt_map.items():
+        if isinstance(mapping, list):
+            # neural prompts
+            labels = mapping
+            prompts = mapping
+        else:
+            # neuro-symbolic prompts
+            labels = []
+            prompts = []
+
+            for label, prompt_list in mapping.items():
+                for p in prompt_list:
+                    labels.append(label)
+                    prompts.append(p)
 
         scores = score_dimension(image_features, prompts)
         results[dimension] = get_label(scores, labels)
