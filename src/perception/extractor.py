@@ -9,7 +9,6 @@ import clip
 import torch
 
 from src.perception.clip_model import encode_image, get_model
-from src.perception.prompts import *
 
 def score_dimension(image_features, prompts):
     """

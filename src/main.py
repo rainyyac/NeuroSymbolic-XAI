@@ -11,7 +11,7 @@ import pathlib
 from src.perception.extractor import extract_attributes
 from src.grounding.grounder import to_asp_facts
 from src.reasoning.asp_runner import run_asp
-from src.explanation.explainer import explain, visualize_result
+from src.explanation.explainer import explain, visualize_result, generate_html_report
 from src.perception.prompts import PROMPT_MAP_NEURAL, PROMPT_MAP_SYMBOLIC
 
 
@@ -54,15 +54,20 @@ def main():
 
         explain(attributes_symb, answer_set)
 
-        # Updated call with all necessary data for the table
-        visualize_result(
+        report_file = generate_html_report(
             image_path=args.image,
             mode_b_risk=mode_b_risk,
             mode_a_risk=mode_a_risk,
             attributes=attributes_symb,
-            answer_set=answer_set,  # New
-            neural_results=neural_results  # New
+            answer_set=answer_set,
+            neural_results=neural_results
         )
+
+        print("\n" + "=" * 50)
+        print("📊 COMPARATIVE AUDIT COMPLETE")
+        print(f"HTML Report generated at: {report_file}")
+        print(f"Open this file in your browser to see the full reasoning trace.")
+        print("=" * 50)
 
     except Exception as e:
         print(f"\n[ERROR]: {e}")
